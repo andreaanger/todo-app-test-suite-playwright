@@ -6,6 +6,12 @@ class HomePage {
     this.page = page;
 
     this.title = page.getByTestId("title");
+
+    // WEEK
+    this.weekLabel = page.locator("#weekLabel");
+    this.previousWeekButton = page.locator("#prevWeek");
+    this.currentWeekButton = page.locator("#currentWeek");
+    this.nextWeekButton = page.locator("#nextWeek");
   }
 
   async navigate() {
