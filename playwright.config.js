@@ -40,14 +40,14 @@ export default defineConfig({
     },
 
     {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
-    },
-
-    {
       name: "webkit",
       use: { ...devices["Desktop Safari"] },
     },
+
+    // {
+    //   name: "firefox",
+    //   use: { ...devices["Desktop Firefox"] },
+    // },
 
     /* Test against mobile viewports. */
     // {
