@@ -44,10 +44,6 @@ class HomePage {
     return addTask;
   }
 
-  getUsername(userId) {
-    return userId == 1 ? process.env.USER_1_NAME : process.env.USER_2_NAME;
-  }
-
   getTaskList(userId) {
     return this.userTaskList(userId).locator("li");
   }
@@ -59,8 +55,7 @@ class HomePage {
       .nth(taskNumber - 1); // -1 since 0-based
   }
 
-  getTaskListEmpty(userId) {
-    const username = this.getUsername(userId);
+  getTaskListEmpty(username) {
     return this.userTaskListEmpty(username);
   }
 }

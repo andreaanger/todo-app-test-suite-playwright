@@ -1,6 +1,14 @@
 import { test as base } from "@playwright/test";
 
 export const test = base.extend({
+  usernames: async ({}, use) => {
+    const users = {
+      user1: process.env.USER_1_NAME,
+      user2: process.env.USER_2_NAME,
+    };
+
+    await use(users);
+  },
   page: async ({ page }, use) => {
     let apiUrl = process.env.APP_URL + "api.php";
     // SETUP:
