@@ -98,3 +98,18 @@ PRIORITY_NAMES.forEach((priority) => {
     await expect(home.getTaskPriority(1, 1)).toHaveText(priority);
   });
 });
+
+test("TC-017: Add task - repeat task count @smoke @add-task @view-list @TC-017", async ({ page }) => {
+  let home = new HomePage(page);
+  const addTask = await home.clickAddTaskForUser(2);
+  const taskName = `Repeating task - ${Date.now()}`;
+  await addTask.taskNameField.fill(taskName);
+  await addTask.repeatTaskCheckbox.check();
+  await addTask.reapeatCountRadio.click();
+  await addTask.reapeatCountInput.fill("3");
+  home = await addTask.clickAddTaskButton();
+  await expect(home.getTaskList(2)).toHaveCount(3);
+  await expect(home.getTaskText(2, 1)).toHaveText(taskName);
+  await expect(home.getTaskText(2, 2)).toHaveText(taskName);
+  await expect(home.getTaskText(2, 3)).toHaveText(taskName);
+});
