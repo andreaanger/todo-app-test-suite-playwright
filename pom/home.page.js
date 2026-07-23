@@ -49,9 +49,14 @@ class HomePage {
   }
 
   getTaskText(userId, taskNumber) {
-    return this.userTaskList(userId)
-      .locator("li")
+    return this.getTaskList(userId)
       .locator(".todo-text")
+      .nth(taskNumber - 1); // -1 since 0-based
+  }
+
+  getTaskPriority(userId, taskNumber) {
+    return this.getTaskList(userId)
+      .locator(".todo-category")
       .nth(taskNumber - 1); // -1 since 0-based
   }
 

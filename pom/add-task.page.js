@@ -7,6 +7,7 @@ class AddTaskPage {
     this.addTaskHeader = page.locator("#taskModalTitle");
     this.taskNameField = page.locator("#todoInput");
     this.ownerDropdown = page.locator("#todoOwner");
+    this.priorityDropdown = page.locator("#todoCategory");
     this.submitButton = page.getByRole("button", { name: "Add Task", exact: true });
   }
 

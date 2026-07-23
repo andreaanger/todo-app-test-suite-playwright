@@ -7,6 +7,7 @@ const { AddTaskPage } = require("../pom/add-task.page.js");
 const { HomePage } = require("../pom/home.page");
 
 const MAX_CHAR_TASK_NAME = 140;
+const PRIORITY_NAMES = process.env.PRIORITY_NAMES.split(",") || ["1"];
 
 // These tests mutate shared app state cleared via API, so they must not run in parallel.
 test.describe.configure({ mode: "serial" });
@@ -83,4 +84,17 @@ test("TC-015: Add task - non-default owner @smoke @add-task @view-list @TC-015",
   home = await addTask.clickAddTaskButton();
   await expect(home.getTaskText(1, 1)).toHaveText(taskName);
   await expect(home.getTaskListEmpty(usernames.user2)).toBeVisible();
+});
+
+PRIORITY_NAMES.forEach((priority) => {
+  test(`TC-016.${priority}: Add task - non-default priority level @smoke @add-task @view-list @priority @TC-016`, async ({ page }) => {
+    let home = new HomePage(page);
+    const addTask = await home.clickAddTaskForUser(1);
+    const taskName = `Priority: ${priority} - ${Date.now()}`;
+    await addTask.taskNameField.fill(taskName);
+    await addTask.priorityDropdown.selectOption(priority);
+    home = await addTask.clickAddTaskButton();
+    await expect(home.getTaskText(1, 1)).toHaveText(taskName);
+    await expect(home.getTaskPriority(1, 1)).toHaveText(priority);
+  });
 });
