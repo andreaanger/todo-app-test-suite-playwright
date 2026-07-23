@@ -7,6 +7,12 @@ class AddTaskPage {
     this.addTaskHeader = page.locator("#taskModalTitle");
     this.taskNameField = page.locator("#todoInput");
     this.ownerDropdown = page.locator("#todoOwner");
+    this.priorityDropdown = page.locator("#todoCategory");
+    this.repeatTaskCheckbox = page.getByLabel(" Repeat?");
+    this.repeatCountRadio = page.getByLabel(" Repeat count");
+    this.reapeatCountInput = page.locator('input[type="number"][name="repeatCount"]');
+    this.repeatDaysRadio = page.getByLabel(" Selected weekdays");
+    this.repeatDayCheckbox = (day) => page.getByLabel(`${day}`);
     this.submitButton = page.getByRole("button", { name: "Add Task", exact: true });
   }
 

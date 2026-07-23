@@ -7,6 +7,8 @@ const { AddTaskPage } = require("../pom/add-task.page.js");
 const { HomePage } = require("../pom/home.page");
 
 const MAX_CHAR_TASK_NAME = 140;
+const MAX_TASK_REPEAT_COUNT = 30;
+const PRIORITY_NAMES = process.env.PRIORITY_NAMES.split(",") || ["1"];
 
 // These tests mutate shared app state cleared via API, so they must not run in parallel.
 test.describe.configure({ mode: "serial" });
@@ -83,4 +85,105 @@ test("TC-015: Add task - non-default owner @smoke @add-task @view-list @TC-015",
   home = await addTask.clickAddTaskButton();
   await expect(home.getTaskText(1, 1)).toHaveText(taskName);
   await expect(home.getTaskListEmpty(usernames.user2)).toBeVisible();
+});
+
+PRIORITY_NAMES.forEach((priority) => {
+  test(`TC-016.${priority}: Add task - non-default priority level @smoke @add-task @view-list @priority @TC-016`, async ({ page }) => {
+    let home = new HomePage(page);
+    const addTask = await home.clickAddTaskForUser(1);
+    const taskName = `Priority: ${priority} - ${Date.now()}`;
+    await addTask.taskNameField.fill(taskName);
+    await addTask.priorityDropdown.selectOption(priority);
+    home = await addTask.clickAddTaskButton();
+    await expect(home.getTaskText(1, 1)).toHaveText(taskName);
+    await expect(home.getTaskPriority(1, 1)).toHaveText(priority);
+  });
+});
+
+test("TC-017: Add task - repeat task count @smoke @add-task @view-list @TC-017", async ({ page }) => {
+  let home = new HomePage(page);
+  const addTask = await home.clickAddTaskForUser(2);
+  const taskName = `Repeating task - ${Date.now()}`;
+  await addTask.taskNameField.fill(taskName);
+  await addTask.repeatTaskCheckbox.check();
+  await addTask.repeatCountRadio.click();
+  await addTask.reapeatCountInput.fill("3");
+  home = await addTask.clickAddTaskButton();
+  await expect(home.getTaskList(2)).toHaveCount(3);
+  await expect(home.getTaskText(2, 1)).toHaveText(taskName);
+  await expect(home.getTaskText(2, 2)).toHaveText(taskName);
+  await expect(home.getTaskText(2, 3)).toHaveText(taskName);
+});
+
+test("TC-018: Add task - repeat task count must not exceed maximum @smoke @add-task @repeat-task @TC-018", async ({ page }) => {
+  let home = new HomePage(page);
+  const addTask = await home.clickAddTaskForUser(1);
+  await addTask.taskNameField.fill(`Repeating task exceeds max - ${Date.now()}`);
+  await addTask.repeatTaskCheckbox.check();
+  await addTask.repeatCountRadio.click();
+  await addTask.reapeatCountInput.fill(String(MAX_TASK_REPEAT_COUNT + 1));
+  await addTask.submitButton.click();
+  // check field validation
+  const isValid = await addTask.reapeatCountInput.evaluate(
+    /** @param {HTMLInputElement} el */
+    (el) => el.checkValidity(),
+  );
+  expect(isValid).toBe(false);
+  // Add Task Modal is still displayed
+  await expect(addTask.taskNameField).toBeVisible();
+});
+
+test("TC-019: Add task - repeat every day @smoke @add-task @view-list @repeat-task @TC-019", async ({ page }) => {
+  let home = new HomePage(page);
+  const addTask = await home.clickAddTaskForUser(2);
+  const taskName = `Repeating task every day - ${Date.now()}`;
+  await addTask.taskNameField.fill(taskName);
+  await addTask.repeatTaskCheckbox.check();
+  await addTask.repeatDaysRadio.click();
+  //select each day
+  const daysToSelect = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  for (const day of daysToSelect) {
+    const dayCheckbox = addTask.repeatDayCheckbox(day);
+    await dayCheckbox.check();
+  }
+  home = await addTask.clickAddTaskButton();
+  // verify tasks created in order
+  await expect(home.getTaskList(2)).toHaveCount(daysToSelect.length);
+  for (const [index, day] of daysToSelect.entries()) {
+    await expect(home.getTaskText(2, index + 1)).toHaveText(`${taskName} (${day})`);
+  }
+});
+
+test("TC-020: Add task - repeat every other day @smoke @add-task @view-list @repeat-task @TC-020", async ({ page }) => {
+  let home = new HomePage(page);
+  const addTask = await home.clickAddTaskForUser(2);
+  const taskName = `Repeating task every other day - ${Date.now()}`;
+  await addTask.taskNameField.fill(taskName);
+  await addTask.repeatTaskCheckbox.check();
+  await addTask.repeatDaysRadio.click();
+  //select each day
+  const daysToSelect = ["Monday", "Wednesday", "Friday", "Sunday"];
+  for (const day of daysToSelect) {
+    const dayCheckbox = addTask.repeatDayCheckbox(day);
+    await dayCheckbox.check();
+  }
+  home = await addTask.clickAddTaskButton();
+  // verify tasks created in order
+  await expect(home.getTaskList(2)).toHaveCount(daysToSelect.length);
+  for (const [index, day] of daysToSelect.entries()) {
+    await expect(home.getTaskText(2, index + 1)).toHaveText(`${taskName} (${day})`);
+  }
+});
+
+test("TC-021: Add task - repeat day requires selection @smoke @add-task @repeat-task @TC-021", async ({ page }) => {
+  let home = new HomePage(page);
+  const addTask = await home.clickAddTaskForUser(2);
+  const taskName = `Repeating task day requires selection - ${Date.now()}`;
+  await addTask.taskNameField.fill(taskName);
+  await addTask.repeatTaskCheckbox.check();
+  await addTask.repeatDaysRadio.click();
+  await addTask.submitButton.click();
+
+  // Add Task Modal is still displayed
+  await expect(addTask.taskNameField).toBeVisible();
 });
