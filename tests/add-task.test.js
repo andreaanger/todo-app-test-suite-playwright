@@ -106,7 +106,7 @@ test("TC-017: Add task - repeat task count @smoke @add-task @view-list @TC-017",
   const taskName = `Repeating task - ${Date.now()}`;
   await addTask.taskNameField.fill(taskName);
   await addTask.repeatTaskCheckbox.check();
-  await addTask.reapeatCountRadio.click();
+  await addTask.repeatCountRadio.click();
   await addTask.reapeatCountInput.fill("3");
   home = await addTask.clickAddTaskButton();
   await expect(home.getTaskList(2)).toHaveCount(3);
@@ -115,12 +115,12 @@ test("TC-017: Add task - repeat task count @smoke @add-task @view-list @TC-017",
   await expect(home.getTaskText(2, 3)).toHaveText(taskName);
 });
 
-test("TC-018: Add task - repeat task count must not exceed maximum @smoke @add-task @TC-018", async ({ page }) => {
+test("TC-018: Add task - repeat task count must not exceed maximum @smoke @add-task @repeat-task @TC-018", async ({ page }) => {
   let home = new HomePage(page);
   const addTask = await home.clickAddTaskForUser(1);
   await addTask.taskNameField.fill(`Repeating task exceeds max - ${Date.now()}`);
   await addTask.repeatTaskCheckbox.check();
-  await addTask.reapeatCountRadio.click();
+  await addTask.repeatCountRadio.click();
   await addTask.reapeatCountInput.fill(String(MAX_TASK_REPEAT_COUNT + 1));
   await addTask.submitButton.click();
   // check field validation
@@ -131,4 +131,25 @@ test("TC-018: Add task - repeat task count must not exceed maximum @smoke @add-t
   expect(isValid).toBe(false);
   // Add Task Modal is still displayed
   await expect(addTask.taskNameField).toBeVisible();
+});
+
+test("TC-019: Add task - repeat every day @smoke @add-task @view-list @repeat-task @TC-019", async ({ page }) => {
+  let home = new HomePage(page);
+  const addTask = await home.clickAddTaskForUser(2);
+  const taskName = `Repeating task every day - ${Date.now()}`;
+  await addTask.taskNameField.fill(taskName);
+  await addTask.repeatTaskCheckbox.check();
+  await addTask.repeatDaysRadio.click();
+  //select each day
+  const daysToSelect = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  for (const day of daysToSelect) {
+    const dayCheckbox = addTask.repeatDayCheckbox(day);
+    await dayCheckbox.check();
+  }
+  home = await addTask.clickAddTaskButton();
+  // verify tasks created in order
+  await expect(home.getTaskList(2)).toHaveCount(daysToSelect.length);
+  for (const [index, day] of daysToSelect.entries()) {
+    await expect(home.getTaskText(2, index + 1)).toHaveText(`${taskName} (${day})`);
+  }
 });
