@@ -7,6 +7,7 @@ const { AddTaskPage } = require("../pom/add-task.page.js");
 const { HomePage } = require("../pom/home.page");
 
 const MAX_CHAR_TASK_NAME = 140;
+const MAX_TASK_REPEAT_COUNT = 30;
 const PRIORITY_NAMES = process.env.PRIORITY_NAMES.split(",") || ["1"];
 
 // These tests mutate shared app state cleared via API, so they must not run in parallel.
@@ -112,4 +113,22 @@ test("TC-017: Add task - repeat task count @smoke @add-task @view-list @TC-017",
   await expect(home.getTaskText(2, 1)).toHaveText(taskName);
   await expect(home.getTaskText(2, 2)).toHaveText(taskName);
   await expect(home.getTaskText(2, 3)).toHaveText(taskName);
+});
+
+test("TC-018: Add task - repeat task count must not exceed maximum @smoke @add-task @TC-018", async ({ page }) => {
+  let home = new HomePage(page);
+  const addTask = await home.clickAddTaskForUser(1);
+  await addTask.taskNameField.fill(`Repeating task exceeds max - ${Date.now()}`);
+  await addTask.repeatTaskCheckbox.check();
+  await addTask.reapeatCountRadio.click();
+  await addTask.reapeatCountInput.fill(String(MAX_TASK_REPEAT_COUNT + 1));
+  await addTask.submitButton.click();
+  // check field validation
+  const isValid = await addTask.reapeatCountInput.evaluate(
+    /** @param {HTMLInputElement} el */
+    (el) => el.checkValidity(),
+  );
+  expect(isValid).toBe(false);
+  // Add Task Modal is still displayed
+  await expect(addTask.taskNameField).toBeVisible();
 });
