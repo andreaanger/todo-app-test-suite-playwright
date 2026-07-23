@@ -37,6 +37,7 @@ jobs:
           WEEK_ONE_START_DATE: ${{ secrets.WEEK_ONE_START_DATE }}
           USER_1_NAME: ${{ secrets.USER_1_NAME }}
           USER_2_NAME: ${{ secrets.USER_2_NAME }}
+          PRIORITY_NAMES: ${{ secrets.PRIORITY_NAMES }}
         run: npx playwright test --grep @smoke
 
       - name: Upload Report
