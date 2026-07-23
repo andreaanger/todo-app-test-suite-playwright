@@ -17,7 +17,7 @@ class AddTaskPage {
     await this.addTaskHeader.waitFor({ state: "visible" });
   }
 
-  async clickAddTaskButton(page) {
+  async clickAddTaskButton() {
     // click Add Task button
     await this.submitButton.click();
     // wait for modal to close before interacting with home page

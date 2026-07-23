@@ -35,11 +35,11 @@ class HomePage {
     await this.title.waitFor({ state: "visible" });
   }
 
-  async clickAddTaskForUser(userId, page) {
+  async clickAddTaskForUser(userId) {
     //click + button for given user
     await this.userAddTaskButton(userId).click();
     // load new page
-    const addTask = new AddTaskPage(page);
+    const addTask = new AddTaskPage(this.page);
     await addTask.verifyLoaded();
     return addTask;
   }
