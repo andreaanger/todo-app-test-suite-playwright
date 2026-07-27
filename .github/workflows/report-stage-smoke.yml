@@ -1,0 +1,71 @@
+name: Reporting Playwright Test Results
+
+on:
+  ## Manually trigger workflow from GitHub Actions UI
+  workflow_dispatch:
+  ## Test Repository - Main branch updated
+  pull_request:
+    branches:
+      - main
+  ## App Repository - Main branch updated
+  repository_dispatch:
+    types: [test_reporting]
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Run smoke tests
+      - name: Checkout Test Code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/checkout@v7
+        with:
+          node-version: lts/*
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright Smoke Tests against Stage Environment
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          APP_TITLE: ${{ secrets.APP_TITLE }}
+          WEEK_ONE_START_DATE: ${{ secrets.WEEK_ONE_START_DATE }}
+          USER_1_NAME: ${{ secrets.USER_1_NAME }}
+          USER_2_NAME: ${{ secrets.USER_2_NAME }}
+          PRIORITY_NAMES: ${{ secrets.PRIORITY_NAMES }}
+        run: npx playwright test --grep @smoke
+
+      # 2. Pull down historical trend data from the gh-pages branch
+      - name: Get Report History
+        uses: actions/checkout@v7
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      # 3. Build the combined report (Current execution + Historical trends)
+      - name: Build Allure Report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        id: allure-report
+        with:
+          allure_results: allure-results
+          gh_pages: gh-pages
+          allure_report: allure-report
+          allure_history: allure-history
+
+      # 4. Publish the report to GitHub Pages
+      - name: Publish Allure Report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISH_BRANCH: gh-pages
+          PUBLISH_DIR: allure-history
