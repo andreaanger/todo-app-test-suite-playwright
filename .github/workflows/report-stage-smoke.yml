@@ -4,7 +4,7 @@ on:
   ## Manually trigger workflow from GitHub Actions UI
   workflow_dispatch:
   ## Test Repository - Main branch updated
-  pull_request:
+  push:
     branches:
       - main
   ## App Repository - Main branch updated
