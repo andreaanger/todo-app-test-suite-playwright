@@ -124,7 +124,7 @@ test(
   },
   async ({ page }) => {
     const home = new HomePage(page);
-    await home.previousWeekButton.click();
+    await home.nextWeekButton.click();
     await home.currentWeekButton.click();
     await expect(home.weekLabel).toHaveText(generateExpectedWeekLabel(0));
     await expect(home.currentWeekButton).toBeEnabled({ enabled: false });

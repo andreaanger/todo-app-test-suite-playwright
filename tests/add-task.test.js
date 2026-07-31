@@ -29,7 +29,7 @@ test(
       (el) => el.checkValidity(),
     );
     expect(isValid).toBe(false);
-    // add task modal still diplayed
+    // add task modal still displayed
     await expect(addTask.taskNameField).toBeVisible();
   },
 );
