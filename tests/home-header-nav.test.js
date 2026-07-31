@@ -10,69 +10,123 @@ test.beforeEach(async ({ page }) => {
 /*******************
       HEADER
 ********************/
-test("TC-001: Title @smoke @header @TC-001", async ({ page }) => {
-  const home = new HomePage(page);
-  await expect(home.title).toHaveText(process.env.APP_TITLE);
-});
+test(
+  "TC-001: Title",
+  {
+    tag: ["@smoke", "@header", "@TC-001"],
+  },
+  async ({ page }) => {
+    const home = new HomePage(page);
+    await expect(home.title).toHaveText(process.env.APP_TITLE);
+  },
+);
 
 /*******************
       WEEK LABEL
 ********************/
-test("TC-002: Week Label - Default @smoke @week @week-label @TC-002", async ({ page }) => {
-  const home = new HomePage(page);
-  await expect(home.weekLabel).toHaveText(generateExpectedWeekLabel(0));
-});
+test(
+  "TC-002: Week Label - Default",
+  {
+    tag: ["@smoke", "@week", "@week-label", "@TC-002"],
+  },
+  async ({ page }) => {
+    const home = new HomePage(page);
+    await expect(home.weekLabel).toHaveText(generateExpectedWeekLabel(0));
+  },
+);
 
-test("TC-003: Week Label - Previous Week @smoke @week @week-label @TC-003", async ({ page }) => {
-  const home = new HomePage(page);
-  await home.previousWeekButton.click();
-  await expect(home.weekLabel).toHaveText(generateExpectedWeekLabel(-1));
-});
+test(
+  "TC-003: Week Label - Previous Week",
+  {
+    tag: ["@smoke", "@week", "@week-label", "@TC-003"],
+  },
+  async ({ page }) => {
+    const home = new HomePage(page);
+    await home.previousWeekButton.click();
+    await expect(home.weekLabel).toHaveText(generateExpectedWeekLabel(-1));
+  },
+);
 
-test("TC-004: Week Label - Next Week @smoke @week @week-label @TC-004", async ({ page }) => {
-  const home = new HomePage(page);
-  await home.nextWeekButton.click();
-  await expect(home.weekLabel).toHaveText(generateExpectedWeekLabel(1));
-});
+test(
+  "TC-004: Week Label - Next Week",
+  {
+    tag: ["@smoke", "@week", "@week-label", "@TC-004"],
+  },
+  async ({ page }) => {
+    const home = new HomePage(page);
+    await home.nextWeekButton.click();
+    await expect(home.weekLabel).toHaveText(generateExpectedWeekLabel(1));
+  },
+);
 
 /*******************
       WEEK NAV
 ********************/
-test("TC-005: Current Week Button - Default State @smoke @week @week-nav @TC-005", async ({ page }) => {
-  const home = new HomePage(page);
-  await expect(home.previousWeekButton).toBeEnabled();
-  await expect(home.currentWeekButton).toBeEnabled({ enabled: false });
-  await expect(home.nextWeekButton).toBeEnabled();
-});
+test(
+  "TC-005: Current Week Button - Default State",
+  {
+    tag: ["@smoke", "@week", "@week-nav", "@TC-005"],
+  },
+  async ({ page }) => {
+    const home = new HomePage(page);
+    await expect(home.previousWeekButton).toBeEnabled();
+    await expect(home.currentWeekButton).toBeEnabled({ enabled: false });
+    await expect(home.nextWeekButton).toBeEnabled();
+  },
+);
 
-test("TC-006: Previous Week Button - All week navigation buttons enabled @smoke @week @week-nav @TC-006", async ({ page }) => {
-  const home = new HomePage(page);
-  await home.previousWeekButton.click();
-  await expect(home.previousWeekButton).toBeEnabled();
-  await expect(home.currentWeekButton).toBeEnabled();
-  await expect(home.nextWeekButton).toBeEnabled();
-});
+test(
+  "TC-006: Previous Week Button - All week navigation buttons enabled",
+  {
+    tag: ["@smoke", "@week", "@week-nav", "@TC-006"],
+  },
+  async ({ page }) => {
+    const home = new HomePage(page);
+    await home.previousWeekButton.click();
+    await expect(home.previousWeekButton).toBeEnabled();
+    await expect(home.currentWeekButton).toBeEnabled();
+    await expect(home.nextWeekButton).toBeEnabled();
+  },
+);
 
-test("TC-007: Next Week Button - All week navigation buttons enabled @smoke @week @week-nav @TC-007", async ({ page }) => {
-  const home = new HomePage(page);
-  await home.nextWeekButton.click();
-  await expect(home.previousWeekButton).toBeEnabled();
-  await expect(home.currentWeekButton).toBeEnabled();
-  await expect(home.nextWeekButton).toBeEnabled();
-});
+test(
+  "TC-007: Next Week Button - All week navigation buttons enabled",
+  {
+    tag: ["@smoke", "@week", "@week-nav", "@TC-007"],
+  },
+  async ({ page }) => {
+    const home = new HomePage(page);
+    await home.nextWeekButton.click();
+    await expect(home.previousWeekButton).toBeEnabled();
+    await expect(home.currentWeekButton).toBeEnabled();
+    await expect(home.nextWeekButton).toBeEnabled();
+  },
+);
 
-test("TC-008: Current Week Button - from Previous Week @smoke @week @week-nav @TC-008", async ({ page }) => {
-  const home = new HomePage(page);
-  await home.previousWeekButton.click();
-  await home.currentWeekButton.click();
-  await expect(home.weekLabel).toHaveText(generateExpectedWeekLabel(0));
-  await expect(home.currentWeekButton).toBeEnabled({ enabled: false });
-});
+test(
+  "TC-008: Current Week Button - from Previous Week",
+  {
+    tag: ["@smoke", "@week", "@week-nav", "@TC-008"],
+  },
+  async ({ page }) => {
+    const home = new HomePage(page);
+    await home.previousWeekButton.click();
+    await home.currentWeekButton.click();
+    await expect(home.weekLabel).toHaveText(generateExpectedWeekLabel(0));
+    await expect(home.currentWeekButton).toBeEnabled({ enabled: false });
+  },
+);
 
-test("TC-009: Current Week Button - from Next Week @smoke @week @week-nav @TC-009", async ({ page }) => {
-  const home = new HomePage(page);
-  await home.previousWeekButton.click();
-  await home.currentWeekButton.click();
-  await expect(home.weekLabel).toHaveText(generateExpectedWeekLabel(0));
-  await expect(home.currentWeekButton).toBeEnabled({ enabled: false });
-});
+test(
+  "TC-009: Current Week Button - from Next Week",
+  {
+    tag: ["@smoke", "@week", "@week-nav", "@TC-009"],
+  },
+  async ({ page }) => {
+    const home = new HomePage(page);
+    await home.previousWeekButton.click();
+    await home.currentWeekButton.click();
+    await expect(home.weekLabel).toHaveText(generateExpectedWeekLabel(0));
+    await expect(home.currentWeekButton).toBeEnabled({ enabled: false });
+  },
+);
