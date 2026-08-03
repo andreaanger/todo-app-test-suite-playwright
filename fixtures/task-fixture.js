@@ -10,10 +10,19 @@ export const test = base.extend({
     await use(users);
   },
   page: async ({ page }, use) => {
-    let apiUrl = process.env.APP_URL + "api.php";
+    const appUrl = new URL(process.env.APP_URL);
+    const accessKey = appUrl.hash.split("#access_key=")[1];
+    if (!accessKey) {
+      throw new Error("APP_URL must include #access_key=... for task reset requests");
+    }
+    appUrl.hash = "";
+    const apiUrl = new URL("api.php", appUrl);
+    apiUrl.searchParams.set("access_key", accessKey);
     // SETUP:
     // clear all tasks via API
-    let response = await page.request.post(apiUrl, { data: '{"action":"clear_all"}' });
+    let response = await page.request.post(apiUrl.toString(), {
+      data: JSON.stringify({ action: "clear_all", access_key: accessKey }),
+    });
     await expect(response.ok()).toBeTruthy();
 
     // navigate to Home page
@@ -25,7 +34,9 @@ export const test = base.extend({
 
     // TEARDOWN:
     // clear all tasks via API
-    response = await page.request.post(apiUrl, { data: '{"action":"clear_all"}' });
+    response = await page.request.post(apiUrl.toString(), {
+      data: JSON.stringify({ action: "clear_all", access_key: accessKey }),
+    });
     await expect(response.ok()).toBeTruthy();
   },
 });
