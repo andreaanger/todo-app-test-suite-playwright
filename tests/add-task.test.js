@@ -46,10 +46,10 @@ test(
       const addTask = await home.clickAddTaskForUser(userId);
       await addTask.taskNameField.fill(taskName);
       home = await addTask.clickAddTaskButton();
-      await expect(home.getTaskList(userId)).toHaveCount(1);
-      await expect(home.getTaskText(userId, 1)).toHaveText(taskName);
+      await expect(home.userTaskListItems(userId)).toHaveCount(1);
+      await expect(home.getTaskElements(userId, 1).text).toHaveText(taskName);
       const otherUsername = userId === 1 ? usernames.user2 : usernames.user1;
-      await expect(home.getTaskListEmpty(otherUsername)).toBeVisible();
+      await expect(home.userTaskListEmpty(otherUsername)).toBeVisible();
     },
   );
 });
@@ -68,7 +68,7 @@ test(
     await expect(addTask.taskNameField).toHaveValue(taskName.substring(0, MAX_CHAR_TASK_NAME));
     // task displays with truncated value on Home page
     home = await addTask.clickAddTaskButton();
-    await expect(home.getTaskText(1, 1)).toHaveText(taskName.substring(0, MAX_CHAR_TASK_NAME));
+    await expect(home.getTaskElements(1, 1).text).toHaveText(taskName.substring(0, MAX_CHAR_TASK_NAME));
   },
 );
 
@@ -85,7 +85,7 @@ test(
     await addTask.taskNameField.fill(specialCharacters);
     home = await addTask.clickAddTaskButton();
     // verify task name within task list
-    await expect(home.getTaskText(2, 1)).toHaveText(specialCharacters);
+    await expect(home.getTaskElements(2, 1).text).toHaveText(specialCharacters);
   },
 );
 
@@ -102,7 +102,7 @@ test(
     await addTask.taskNameField.fill(emojis);
     home = await addTask.clickAddTaskButton();
     // verify task name within task list
-    await expect(home.getTaskText(1, 1)).toHaveText(emojis);
+    await expect(home.getTaskElements(1, 1).text).toHaveText(emojis);
   },
 );
 
@@ -118,8 +118,8 @@ test(
     await addTask.taskNameField.fill(taskName);
     await addTask.ownerDropdown.selectOption(usernames.user1);
     home = await addTask.clickAddTaskButton();
-    await expect(home.getTaskText(1, 1)).toHaveText(taskName);
-    await expect(home.getTaskListEmpty(usernames.user2)).toBeVisible();
+    await expect(home.getTaskElements(1, 1).text).toHaveText(taskName);
+    await expect(home.userTaskListEmpty(usernames.user2)).toBeVisible();
   },
 );
 
@@ -136,8 +136,8 @@ PRIORITY_NAMES.forEach((priority) => {
       await addTask.taskNameField.fill(taskName);
       await addTask.priorityDropdown.selectOption(priority);
       home = await addTask.clickAddTaskButton();
-      await expect(home.getTaskText(1, 1)).toHaveText(taskName);
-      await expect(home.getTaskPriority(1, 1)).toHaveText(priority);
+      await expect(home.getTaskElements(1, 1).text).toHaveText(taskName);
+      await expect(home.getTaskElements(1, 1).priority).toHaveText(priority);
     },
   );
 });
@@ -156,10 +156,10 @@ test(
     await addTask.repeatCountRadio.click();
     await addTask.reapeatCountInput.fill("3");
     home = await addTask.clickAddTaskButton();
-    await expect(home.getTaskList(2)).toHaveCount(3);
-    await expect(home.getTaskText(2, 1)).toHaveText(taskName);
-    await expect(home.getTaskText(2, 2)).toHaveText(taskName);
-    await expect(home.getTaskText(2, 3)).toHaveText(taskName);
+    await expect(home.userTaskListItems(2)).toHaveCount(3);
+    await expect(home.getTaskElements(2, 1).text).toHaveText(taskName);
+    await expect(home.getTaskElements(2, 2).text).toHaveText(taskName);
+    await expect(home.getTaskElements(2, 3).text).toHaveText(taskName);
   },
 );
 
@@ -207,9 +207,9 @@ test(
     }
     home = await addTask.clickAddTaskButton();
     // verify tasks created in order
-    await expect(home.getTaskList(2)).toHaveCount(daysToSelect.length);
+    await expect(home.userTaskListItems(2)).toHaveCount(daysToSelect.length);
     for (const [index, day] of daysToSelect.entries()) {
-      await expect(home.getTaskText(2, index + 1)).toHaveText(`${taskName} (${day})`);
+      await expect(home.getTaskElements(2, index + 1).text).toHaveText(`${taskName} (${day})`);
     }
   },
 );
@@ -234,9 +234,9 @@ test(
     }
     home = await addTask.clickAddTaskButton();
     // verify tasks created in order
-    await expect(home.getTaskList(2)).toHaveCount(daysToSelect.length);
+    await expect(home.userTaskListItems(2)).toHaveCount(daysToSelect.length);
     for (const [index, day] of daysToSelect.entries()) {
-      await expect(home.getTaskText(2, index + 1)).toHaveText(`${taskName} (${day})`);
+      await expect(home.getTaskElements(2, index + 1).text).toHaveText(`${taskName} (${day})`);
     }
   },
 );

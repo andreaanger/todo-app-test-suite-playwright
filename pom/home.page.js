@@ -20,8 +20,15 @@ class HomePage {
     this.userAddTaskButton = (userId) => page.getByTestId(`user-${userId}-add-task-button`);
 
     // TASK LIST
-    this.userTaskList = (userId) => page.getByTestId(`user-${userId}-task-list`);
-    this.userTaskListEmpty = (username) => page.locator(`text=/No tasks for ${username} yet\./`);
+    // general elements
+    this.userTaskListContainer = (userId) => page.getByTestId(`user-${userId}-task-list`); // container for user tasks
+    this.userTaskListItems = (userId) => this.userTaskListContainer(userId).getByRole("listitem"); // all tasks for user
+    this.userTaskListEmpty = (username) => page.locator(`text=/No tasks for ${username} yet\./`); // user empty state
+    // elements inside specified task
+    this.taskCheckbox = (task) => task.getByRole("checkbox");
+    this.taskText = (task) => task.locator(".todo-text");
+    this.taskPriority = (task) => task.locator(".todo-category");
+    this.taskEditButton = (task) => task.getByRole("button");
   }
 
   /**************************
@@ -44,24 +51,23 @@ class HomePage {
     return addTask;
   }
 
-  getTaskList(userId) {
-    return this.userTaskList(userId).locator("li");
+  /**************************
+   **      HELPER          **
+   **************************/
+
+  getTask(userId, taskNumber) {
+    const taskItems = this.userTaskListItems(userId);
+    return taskItems.nth(taskNumber - 1); // -1 since 0-based;
   }
 
-  getTaskText(userId, taskNumber) {
-    return this.getTaskList(userId)
-      .locator(".todo-text")
-      .nth(taskNumber - 1); // -1 since 0-based
-  }
-
-  getTaskPriority(userId, taskNumber) {
-    return this.getTaskList(userId)
-      .locator(".todo-category")
-      .nth(taskNumber - 1); // -1 since 0-based
-  }
-
-  getTaskListEmpty(username) {
-    return this.userTaskListEmpty(username);
+  getTaskElements(userId, taskNumber) {
+    const task = this.getTask(userId, taskNumber);
+    return {
+      checkbox: this.taskCheckbox(task),
+      text: this.taskText(task),
+      priority: this.taskPriority(task),
+      editButton: this.taskEditButton(task),
+    };
   }
 }
 
