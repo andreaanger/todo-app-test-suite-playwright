@@ -14,9 +14,23 @@ const PRIORITY_NAMES = process.env.PRIORITY_NAMES.split(",") || ["1"];
 test.describe.configure({ mode: "serial" });
 
 test(
-  "TC-010:	Add task - empty task name not allowed",
+  "TC-010:	Add task - closing modal",
   {
     tag: ["@smoke", "@add-task", "@TC-010"],
+  },
+  async ({ page, usernames }) => {
+    let home = new HomePage(page);
+    const addTask = await home.clickAddTaskForUser(1);
+    await addTask.taskNameField.fill(`Test task ${Date.now}`);
+    home = await addTask.clickCloseButton();
+    await expect(home.userTaskListEmpty(usernames.user1)).toBeVisible();
+  },
+);
+
+test(
+  "TC-011:	Add task - empty task name not allowed",
+  {
+    tag: ["@smoke", "@add-task", "@TC-011"],
   },
   async ({ page }) => {
     const home = new HomePage(page);
@@ -36,9 +50,9 @@ test(
 
 [1, 2].forEach((userId) => {
   test(
-    `TC-011.${userId}: Add task - valid name with defaults`,
+    `TC-012.${userId}: Add task - valid name with defaults`,
     {
-      tag: ["@smoke", "@add-task", "@view-list", `@user${userId}`, "@TC-011"],
+      tag: ["@smoke", "@add-task", "@view-list", `@user${userId}`, "@TC-012"],
     },
     async ({ page, usernames }) => {
       const taskName = `Test Task ${Date.now()}`;
@@ -55,9 +69,9 @@ test(
 });
 
 test(
-  "TC-012: Add task - task name exceeds max character limit",
+  "TC-013: Add task - task name exceeds max character limit",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@TC-012"],
+    tag: ["@smoke", "@add-task", "@view-list", "@TC-013"],
   },
   async ({ page }) => {
     const taskName = Date.now() + "A".repeat(MAX_CHAR_TASK_NAME);
@@ -73,9 +87,9 @@ test(
 );
 
 test(
-  "TC-013: Add task - task name contains special characters",
+  "TC-014: Add task - task name contains special characters",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@TC-013"],
+    tag: ["@smoke", "@add-task", "@view-list", "@TC-014"],
   },
   async ({ page }) => {
     // create task
@@ -90,9 +104,9 @@ test(
 );
 
 test(
-  "TC-014: Add task - task name contains emojis",
+  "TC-015: Add task - task name contains emojis",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@TC-014"],
+    tag: ["@smoke", "@add-task", "@view-list", "@TC-015"],
   },
   async ({ page }) => {
     // create task
@@ -107,9 +121,9 @@ test(
 );
 
 test(
-  "TC-015: Add task - non-default owner",
+  "TC-016: Add task - non-default owner",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@TC-015"],
+    tag: ["@smoke", "@add-task", "@view-list", "@TC-016"],
   },
   async ({ page, usernames }) => {
     let home = new HomePage(page);
@@ -125,9 +139,9 @@ test(
 
 PRIORITY_NAMES.forEach((priority) => {
   test(
-    `TC-016.${priority}: Add task - non-default priority level`,
+    `TC-017.${priority}: Add task - non-default priority level`,
     {
-      tag: ["@smoke", "@add-task", "@view-list", "@priority", "@TC-016"],
+      tag: ["@smoke", "@add-task", "@view-list", "@priority", "@TC-017"],
     },
     async ({ page }) => {
       let home = new HomePage(page);
@@ -143,9 +157,9 @@ PRIORITY_NAMES.forEach((priority) => {
 });
 
 test(
-  "TC-017: Add task - repeat task count",
+  "TC-018: Add task - repeat task count",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@TC-017"],
+    tag: ["@smoke", "@add-task", "@view-list", "@TC-018"],
   },
   async ({ page }) => {
     let home = new HomePage(page);
@@ -164,9 +178,9 @@ test(
 );
 
 test(
-  "TC-018: Add task - repeat task count must not exceed maximum",
+  "TC-019: Add task - repeat task count must not exceed maximum",
   {
-    tag: ["@smoke", "@add-task", "@repeat-task", "@TC-018"],
+    tag: ["@smoke", "@add-task", "@repeat-task", "@TC-019"],
   },
   async ({ page }) => {
     let home = new HomePage(page);
@@ -188,9 +202,9 @@ test(
 );
 
 test(
-  "TC-019: Add task - repeat every day",
+  "TC-020: Add task - repeat every day",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@repeat-task", "@TC-019"],
+    tag: ["@smoke", "@add-task", "@view-list", "@repeat-task", "@TC-020"],
   },
   async ({ page }) => {
     let home = new HomePage(page);
@@ -215,9 +229,9 @@ test(
 );
 
 test(
-  "TC-020: Add task - repeat every other day",
+  "TC-021: Add task - repeat every other day",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@repeat-task", "@TC-020"],
+    tag: ["@smoke", "@add-task", "@view-list", "@repeat-task", "@TC-021"],
   },
   async ({ page }) => {
     let home = new HomePage(page);
@@ -242,9 +256,9 @@ test(
 );
 
 test(
-  "TC-021: Add task - repeat day requires selection",
+  "TC-022: Add task - repeat day requires selection",
   {
-    tag: ["@smoke", "@add-task", "@repeat-task", "@TC-021"],
+    tag: ["@smoke", "@add-task", "@repeat-task", "@TC-022"],
   },
   async ({ page }) => {
     let home = new HomePage(page);

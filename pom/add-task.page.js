@@ -5,6 +5,7 @@ class AddTaskPage {
      **      LOCATORS        **
      **************************/
     this.addTaskHeader = page.locator("#taskModalTitle");
+    this.closeButton = page.getByRole("button", { name: "Close" });
     this.taskNameField = page.locator("#todoInput");
     this.ownerDropdown = page.locator("#todoOwner");
     this.priorityDropdown = page.locator("#todoCategory");
@@ -29,6 +30,15 @@ class AddTaskPage {
     // wait for modal to close before interacting with home page
     await this.addTaskHeader.waitFor({ state: "hidden" });
     // load home page
+    const { HomePage } = require("./home.page");
+    const home = new HomePage(this.page);
+    await home.verifyLoaded();
+    return home;
+  }
+
+  async clickCloseButton() {
+    await this.closeButton.click();
+    await this.addTaskHeader.waitFor({ state: "hidden" });
     const { HomePage } = require("./home.page");
     const home = new HomePage(this.page);
     await home.verifyLoaded();
