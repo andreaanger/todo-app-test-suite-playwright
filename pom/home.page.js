@@ -1,4 +1,5 @@
 const { AddTaskPage } = require("./add-task.page.js");
+const { EditTaskPage } = require("./edit-task.page.js");
 
 class HomePage {
   constructor(page) {
@@ -49,6 +50,15 @@ class HomePage {
     const addTask = new AddTaskPage(this.page);
     await addTask.verifyLoaded();
     return addTask;
+  }
+
+  async clickEditTask(userId, taskNumber) {
+    // click button
+    await this.getTaskElements(userId, taskNumber).editButton.click();
+    // load new page
+    const editTask = new EditTaskPage(this.page);
+    await editTask.verifyLoaded();
+    return editTask;
   }
 
   /**************************
