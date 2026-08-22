@@ -92,7 +92,8 @@ export const seedTasks = {
         expect(response.ok()).toBeTruthy();
 
         const created = await response.json();
-        createdTasks.push(created);
+
+        createdTasks.push(Object.assign({}, payload, created));
       }
       return createdTasks;
     };

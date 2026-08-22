@@ -19,8 +19,7 @@ class EditTaskPage {
     await this.editTaskHeader.waitFor({ state: "visible" });
   }
 
-  async clickSaveButton() {
-    await this.saveButton.click();
+  async verifyModalClosed() {
     // verify modal closed
     await this.editTaskHeader.waitFor({ state: "hidden" });
     // home page displayed once closed
@@ -28,6 +27,21 @@ class EditTaskPage {
     const home = new HomePage(this.page);
     await home.verifyLoaded();
     return home;
+  }
+
+  async clickCloseButton() {
+    await this.closeButton.click();
+    return this.verifyModalClosed();
+  }
+
+  async clickSaveButton() {
+    await this.saveButton.click();
+    return this.verifyModalClosed();
+  }
+
+  async clickDeleteButton() {
+    await this.deleteButton.click();
+    return this.verifyModalClosed();
   }
 }
 
