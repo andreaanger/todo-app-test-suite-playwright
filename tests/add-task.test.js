@@ -6,8 +6,8 @@ import { expect } from "@playwright/test";
 const { AddTaskPage } = require("../pom/add-task.page.js");
 const { HomePage } = require("../pom/home.page");
 
-const MAX_CHAR_TASK_NAME = 140;
-const MAX_TASK_REPEAT_COUNT = 30;
+const MAX_CHAR_TASK_NAME = parseInt(process.env.MAX_CHAR_TASK_NAME);
+const MAX_TASK_REPEAT_COUNT = parseInt(process.env.MAX_TASK_REPEAT_COUNT);
 const PRIORITY_NAMES = process.env.PRIORITY_NAMES.split(",") || ["1"];
 
 // These tests mutate shared app state cleared via API, so they must not run in parallel.
