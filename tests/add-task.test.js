@@ -6,17 +6,31 @@ import { expect } from "@playwright/test";
 const { AddTaskPage } = require("../pom/add-task.page.js");
 const { HomePage } = require("../pom/home.page");
 
-const MAX_CHAR_TASK_NAME = 140;
-const MAX_TASK_REPEAT_COUNT = 30;
+const MAX_CHAR_TASK_NAME = parseInt(process.env.MAX_CHAR_TASK_NAME);
+const MAX_TASK_REPEAT_COUNT = parseInt(process.env.MAX_TASK_REPEAT_COUNT);
 const PRIORITY_NAMES = process.env.PRIORITY_NAMES.split(",") || ["1"];
 
 // These tests mutate shared app state cleared via API, so they must not run in parallel.
 test.describe.configure({ mode: "serial" });
 
 test(
-  "TC-010:	Add task - empty task name not allowed",
+  "TC-010:	Add task - closing modal",
   {
     tag: ["@smoke", "@add-task", "@TC-010"],
+  },
+  async ({ page, usernames }) => {
+    let home = new HomePage(page);
+    const addTask = await home.clickAddTaskForUser(1);
+    await addTask.taskNameField.fill(`Test task ${Date.now}`);
+    home = await addTask.clickCloseButton();
+    await expect(home.userTaskListEmpty(usernames.user1)).toBeVisible();
+  },
+);
+
+test(
+  "TC-011:	Add task - empty task name not allowed",
+  {
+    tag: ["@smoke", "@add-task", "@TC-011"],
   },
   async ({ page }) => {
     const home = new HomePage(page);
@@ -36,9 +50,9 @@ test(
 
 [1, 2].forEach((userId) => {
   test(
-    `TC-011.${userId}: Add task - valid name with defaults`,
+    `TC-012.${userId}: Add task - valid name with defaults`,
     {
-      tag: ["@smoke", "@add-task", "@view-list", `@user${userId}`, "@TC-011"],
+      tag: ["@smoke", "@add-task", "@view-list", `@user${userId}`, "@TC-012"],
     },
     async ({ page, usernames }) => {
       const taskName = `Test Task ${Date.now()}`;
@@ -46,18 +60,18 @@ test(
       const addTask = await home.clickAddTaskForUser(userId);
       await addTask.taskNameField.fill(taskName);
       home = await addTask.clickAddTaskButton();
-      await expect(home.getTaskList(userId)).toHaveCount(1);
-      await expect(home.getTaskText(userId, 1)).toHaveText(taskName);
+      await expect(home.userTaskListItems(userId)).toHaveCount(1);
+      await expect(home.getTaskElements(userId, 1).text).toHaveText(taskName);
       const otherUsername = userId === 1 ? usernames.user2 : usernames.user1;
-      await expect(home.getTaskListEmpty(otherUsername)).toBeVisible();
+      await expect(home.userTaskListEmpty(otherUsername)).toBeVisible();
     },
   );
 });
 
 test(
-  "TC-012: Add task - task name exceeds max character limit",
+  "TC-013: Add task - task name exceeds max character limit",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@TC-012"],
+    tag: ["@smoke", "@add-task", "@view-list", "@TC-013"],
   },
   async ({ page }) => {
     const taskName = Date.now() + "A".repeat(MAX_CHAR_TASK_NAME);
@@ -68,14 +82,14 @@ test(
     await expect(addTask.taskNameField).toHaveValue(taskName.substring(0, MAX_CHAR_TASK_NAME));
     // task displays with truncated value on Home page
     home = await addTask.clickAddTaskButton();
-    await expect(home.getTaskText(1, 1)).toHaveText(taskName.substring(0, MAX_CHAR_TASK_NAME));
+    await expect(home.getTaskElements(1, 1).text).toHaveText(taskName.substring(0, MAX_CHAR_TASK_NAME));
   },
 );
 
 test(
-  "TC-013: Add task - task name contains special characters",
+  "TC-014: Add task - task name contains special characters",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@TC-013"],
+    tag: ["@smoke", "@add-task", "@view-list", "@TC-014"],
   },
   async ({ page }) => {
     // create task
@@ -85,14 +99,14 @@ test(
     await addTask.taskNameField.fill(specialCharacters);
     home = await addTask.clickAddTaskButton();
     // verify task name within task list
-    await expect(home.getTaskText(2, 1)).toHaveText(specialCharacters);
+    await expect(home.getTaskElements(2, 1).text).toHaveText(specialCharacters);
   },
 );
 
 test(
-  "TC-014: Add task - task name contains emojis",
+  "TC-015: Add task - task name contains emojis",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@TC-014"],
+    tag: ["@smoke", "@add-task", "@view-list", "@TC-015"],
   },
   async ({ page }) => {
     // create task
@@ -102,14 +116,14 @@ test(
     await addTask.taskNameField.fill(emojis);
     home = await addTask.clickAddTaskButton();
     // verify task name within task list
-    await expect(home.getTaskText(1, 1)).toHaveText(emojis);
+    await expect(home.getTaskElements(1, 1).text).toHaveText(emojis);
   },
 );
 
 test(
-  "TC-015: Add task - non-default owner",
+  "TC-016: Add task - non-default owner",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@TC-015"],
+    tag: ["@smoke", "@add-task", "@view-list", "@TC-016"],
   },
   async ({ page, usernames }) => {
     let home = new HomePage(page);
@@ -118,16 +132,16 @@ test(
     await addTask.taskNameField.fill(taskName);
     await addTask.ownerDropdown.selectOption(usernames.user1);
     home = await addTask.clickAddTaskButton();
-    await expect(home.getTaskText(1, 1)).toHaveText(taskName);
-    await expect(home.getTaskListEmpty(usernames.user2)).toBeVisible();
+    await expect(home.getTaskElements(1, 1).text).toHaveText(taskName);
+    await expect(home.userTaskListEmpty(usernames.user2)).toBeVisible();
   },
 );
 
 PRIORITY_NAMES.forEach((priority) => {
   test(
-    `TC-016.${priority}: Add task - non-default priority level`,
+    `TC-017.${priority}: Add task - non-default priority level`,
     {
-      tag: ["@smoke", "@add-task", "@view-list", "@priority", "@TC-016"],
+      tag: ["@smoke", "@add-task", "@view-list", "@priority", "@TC-017"],
     },
     async ({ page }) => {
       let home = new HomePage(page);
@@ -136,16 +150,16 @@ PRIORITY_NAMES.forEach((priority) => {
       await addTask.taskNameField.fill(taskName);
       await addTask.priorityDropdown.selectOption(priority);
       home = await addTask.clickAddTaskButton();
-      await expect(home.getTaskText(1, 1)).toHaveText(taskName);
-      await expect(home.getTaskPriority(1, 1)).toHaveText(priority);
+      await expect(home.getTaskElements(1, 1).text).toHaveText(taskName);
+      await expect(home.getTaskElements(1, 1).priority).toHaveText(priority);
     },
   );
 });
 
 test(
-  "TC-017: Add task - repeat task count",
+  "TC-018: Add task - repeat task count",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@TC-017"],
+    tag: ["@smoke", "@add-task", "@view-list", "@TC-018"],
   },
   async ({ page }) => {
     let home = new HomePage(page);
@@ -156,17 +170,17 @@ test(
     await addTask.repeatCountRadio.click();
     await addTask.reapeatCountInput.fill("3");
     home = await addTask.clickAddTaskButton();
-    await expect(home.getTaskList(2)).toHaveCount(3);
-    await expect(home.getTaskText(2, 1)).toHaveText(taskName);
-    await expect(home.getTaskText(2, 2)).toHaveText(taskName);
-    await expect(home.getTaskText(2, 3)).toHaveText(taskName);
+    await expect(home.userTaskListItems(2)).toHaveCount(3);
+    await expect(home.getTaskElements(2, 1).text).toHaveText(taskName);
+    await expect(home.getTaskElements(2, 2).text).toHaveText(taskName);
+    await expect(home.getTaskElements(2, 3).text).toHaveText(taskName);
   },
 );
 
 test(
-  "TC-018: Add task - repeat task count must not exceed maximum",
+  "TC-019: Add task - repeat task count must not exceed maximum",
   {
-    tag: ["@smoke", "@add-task", "@repeat-task", "@TC-018"],
+    tag: ["@smoke", "@add-task", "@repeat-task", "@TC-019"],
   },
   async ({ page }) => {
     let home = new HomePage(page);
@@ -188,9 +202,9 @@ test(
 );
 
 test(
-  "TC-019: Add task - repeat every day",
+  "TC-020: Add task - repeat every day",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@repeat-task", "@TC-019"],
+    tag: ["@smoke", "@add-task", "@view-list", "@repeat-task", "@TC-020"],
   },
   async ({ page }) => {
     let home = new HomePage(page);
@@ -207,17 +221,17 @@ test(
     }
     home = await addTask.clickAddTaskButton();
     // verify tasks created in order
-    await expect(home.getTaskList(2)).toHaveCount(daysToSelect.length);
+    await expect(home.userTaskListItems(2)).toHaveCount(daysToSelect.length);
     for (const [index, day] of daysToSelect.entries()) {
-      await expect(home.getTaskText(2, index + 1)).toHaveText(`${taskName} (${day})`);
+      await expect(home.getTaskElements(2, index + 1).text).toHaveText(`${taskName} (${day})`);
     }
   },
 );
 
 test(
-  "TC-020: Add task - repeat every other day",
+  "TC-021: Add task - repeat every other day",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@repeat-task", "@TC-020"],
+    tag: ["@smoke", "@add-task", "@view-list", "@repeat-task", "@TC-021"],
   },
   async ({ page }) => {
     let home = new HomePage(page);
@@ -234,17 +248,17 @@ test(
     }
     home = await addTask.clickAddTaskButton();
     // verify tasks created in order
-    await expect(home.getTaskList(2)).toHaveCount(daysToSelect.length);
+    await expect(home.userTaskListItems(2)).toHaveCount(daysToSelect.length);
     for (const [index, day] of daysToSelect.entries()) {
-      await expect(home.getTaskText(2, index + 1)).toHaveText(`${taskName} (${day})`);
+      await expect(home.getTaskElements(2, index + 1).text).toHaveText(`${taskName} (${day})`);
     }
   },
 );
 
 test(
-  "TC-021: Add task - repeat day requires selection",
+  "TC-022: Add task - repeat day requires selection",
   {
-    tag: ["@smoke", "@add-task", "@repeat-task", "@TC-021"],
+    tag: ["@smoke", "@add-task", "@repeat-task", "@TC-022"],
   },
   async ({ page }) => {
     let home = new HomePage(page);

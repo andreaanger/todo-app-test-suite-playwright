@@ -1,6 +1,6 @@
 import { test as base, expect } from "@playwright/test";
 
-export const test = base.extend({
+export const taskBase = {
   usernames: async ({}, use) => {
     const users = {
       user1: process.env.USER_1_NAME,
@@ -39,4 +39,6 @@ export const test = base.extend({
     });
     await expect(response.ok()).toBeTruthy();
   },
-});
+};
+
+export const test = base.extend(taskBase);

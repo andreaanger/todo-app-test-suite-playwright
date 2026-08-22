@@ -12,20 +12,28 @@ function getTodayDate() {
 }
 
 /**
- * Calculates the first day of a week relative to the current week.
+ * Calculates the date of Monday for the given week number, relative to the current week.
  *
  * @param {number} weekOffset - The number of weeks to look ahead or behind.
  *   - Use `0` for the current week.
  *   - Use negative numbers for past weeks (ex: `-1` for last week)
  *   - Use positive numbers for future weeks (ex: `1` for next week)
- * @returns {Date} The date of the first day of that week
+ * @returns {Date} The date of the Monday of the week
  */
-function calculateTargetDate(weekOffset) {
+export function calculateTargetDate(weekOffset) {
   // start from todays date
   let targetDate = getTodayDate();
 
   // Apply the week offset by adding/subtracting weeks in milliseconds
-  return targetDate.setTime(targetDate.getTime() + weekOffset * ONE_WEEK_IN_MS);
+  targetDate.setTime(targetDate.getTime() + weekOffset * ONE_WEEK_IN_MS);
+
+  // Find how many days we need to subtract to get back to Monday
+  const currentDayOfWeek = targetDate.getDay();
+  const daysToSubtract = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1;
+
+  // Calculate Monday (Start of the Week)
+  const monday = new Date(targetDate);
+  return monday.setDate(targetDate.getDate() - daysToSubtract);
 }
 
 /**
@@ -43,24 +51,16 @@ function calculateWeekNumber(targetDateMs) {
 }
 
 /**
- * Calculates the date range of the week in which the target date occurs.
+ * Calculates the date range of the week when given the Monday in milliseconds.
  * The week is Monday - Sunday.
  *
- * @param {number} targetDateMs - The date in milliseconds that the week begins
+ * @param {number} targetDateMs - The date in milliseconds for the Monday that the week begins
  * @returns {string} The range of dates for the week in which the target date occurs.
  * (Ex:"August 3 - August 9")
  */
 function calculateWeekDateRange(targetDateMs) {
-  const targetDate = new Date(targetDateMs);
-  // Find how many days we need to subtract to get back to Monday
-  const currentDayOfWeek = targetDate.getDay();
-  const daysToSubtract = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1;
-
-  // Calculate Monday (Start of the Week)
-  const monday = new Date(targetDate);
-  monday.setDate(targetDate.getDate() - daysToSubtract);
-
   // Calculate Sunday (End of the Week)
+  const monday = new Date(targetDateMs);
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
 
