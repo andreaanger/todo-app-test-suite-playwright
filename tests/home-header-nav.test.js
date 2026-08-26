@@ -38,7 +38,7 @@ test(
 test(
   "TC-003: Week Label - Previous Week",
   {
-    tag: ["@smoke", "@week", "@week-label", "@TC-003"],
+    tag: ["@week", "@week-label", "@TC-003"],
   },
   async ({ page }) => {
     const home = new HomePage(page);
@@ -50,7 +50,7 @@ test(
 test(
   "TC-004: Week Label - Next Week",
   {
-    tag: ["@smoke", "@week", "@week-label", "@TC-004"],
+    tag: ["@week", "@week-label", "@TC-004"],
   },
   async ({ page }) => {
     const home = new HomePage(page);
@@ -65,7 +65,7 @@ test(
 test(
   "TC-005: Current Week Button - Default State",
   {
-    tag: ["@smoke", "@week", "@week-nav", "@TC-005"],
+    tag: ["@week", "@week-nav", "@TC-005"],
   },
   async ({ page }) => {
     const home = new HomePage(page);
@@ -78,7 +78,7 @@ test(
 test(
   "TC-006: Previous Week Button - All week navigation buttons enabled",
   {
-    tag: ["@smoke", "@week", "@week-nav", "@TC-006"],
+    tag: ["@week", "@week-nav", "@TC-006"],
   },
   async ({ page }) => {
     const home = new HomePage(page);
@@ -92,7 +92,7 @@ test(
 test(
   "TC-007: Next Week Button - All week navigation buttons enabled",
   {
-    tag: ["@smoke", "@week", "@week-nav", "@TC-007"],
+    tag: ["@week", "@week-nav", "@TC-007"],
   },
   async ({ page }) => {
     const home = new HomePage(page);
@@ -120,7 +120,7 @@ test(
 test(
   "TC-009: Current Week Button - from Next Week",
   {
-    tag: ["@smoke", "@week", "@week-nav", "@TC-009"],
+    tag: ["@week", "@week-nav", "@TC-009"],
   },
   async ({ page }) => {
     const home = new HomePage(page);

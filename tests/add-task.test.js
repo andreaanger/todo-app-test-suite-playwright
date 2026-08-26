@@ -16,7 +16,7 @@ test.describe.configure({ mode: "serial" });
 test(
   "TC-010:	Add task - closing modal",
   {
-    tag: ["@smoke", "@add-task", "@TC-010"],
+    tag: ["@add-task", "@TC-010"],
   },
   async ({ page, usernames }) => {
     let home = new HomePage(page);
@@ -30,7 +30,7 @@ test(
 test(
   "TC-011:	Add task - empty task name not allowed",
   {
-    tag: ["@smoke", "@add-task", "@TC-011"],
+    tag: ["@add-task", "@TC-011"],
   },
   async ({ page }) => {
     const home = new HomePage(page);
@@ -71,7 +71,7 @@ test(
 test(
   "TC-013: Add task - task name exceeds max character limit",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@TC-013"],
+    tag: ["@add-task", "@view-list", "@TC-013"],
   },
   async ({ page }) => {
     const taskName = Date.now() + "A".repeat(MAX_CHAR_TASK_NAME);
@@ -89,7 +89,7 @@ test(
 test(
   "TC-014: Add task - task name contains special characters",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@TC-014"],
+    tag: ["@add-task", "@view-list", "@TC-014"],
   },
   async ({ page }) => {
     // create task
@@ -106,7 +106,7 @@ test(
 test(
   "TC-015: Add task - task name contains emojis",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@TC-015"],
+    tag: ["@add-task", "@view-list", "@TC-015"],
   },
   async ({ page }) => {
     // create task
@@ -123,7 +123,7 @@ test(
 test(
   "TC-016: Add task - non-default owner",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@TC-016"],
+    tag: ["@add-task", "@view-list", "@TC-016"],
   },
   async ({ page, usernames }) => {
     let home = new HomePage(page);
@@ -138,10 +138,13 @@ test(
 );
 
 PRIORITY_NAMES.forEach((priority) => {
+  // only priority 1 will have the smoke tag
+  const tags = priority === PRIORITY_NAMES[0] ? ["@smoke", "@add-task", "@view-list", "@priority", "@TC-017"] : ["@add-task", "@view-list", "@priority", "@TC-017"];
+
   test(
     `TC-017.${priority}: Add task - non-default priority level`,
     {
-      tag: ["@smoke", "@add-task", "@view-list", "@priority", "@TC-017"],
+      tag: tags,
     },
     async ({ page }) => {
       let home = new HomePage(page);
@@ -180,7 +183,7 @@ test(
 test(
   "TC-019: Add task - repeat task count must not exceed maximum",
   {
-    tag: ["@smoke", "@add-task", "@repeat-task", "@TC-019"],
+    tag: ["@add-task", "@repeat-task", "@TC-019"],
   },
   async ({ page }) => {
     let home = new HomePage(page);
@@ -231,7 +234,7 @@ test(
 test(
   "TC-021: Add task - repeat every other day",
   {
-    tag: ["@smoke", "@add-task", "@view-list", "@repeat-task", "@TC-021"],
+    tag: ["@add-task", "@view-list", "@repeat-task", "@TC-021"],
   },
   async ({ page }) => {
     let home = new HomePage(page);
@@ -258,7 +261,7 @@ test(
 test(
   "TC-022: Add task - repeat day requires selection",
   {
-    tag: ["@smoke", "@add-task", "@repeat-task", "@TC-022"],
+    tag: ["@add-task", "@repeat-task", "@TC-022"],
   },
   async ({ page }) => {
     let home = new HomePage(page);
