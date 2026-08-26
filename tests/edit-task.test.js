@@ -25,7 +25,7 @@ test.beforeEach(async ({ page, seedTasks }) => {
 test(
   "TC-023:	Edit task - closing modal",
   {
-    tag: ["@smoke", "@edit-task", "@TC-023"],
+    tag: ["@edit-task", "@TC-023"],
   },
   async ({ page, usernames }) => {
     let home = new HomePage(page);
@@ -83,7 +83,7 @@ test(
 test(
   "TC-027: Edit task - new ask name exceeds max character limit",
   {
-    tags: ["@smoke", "@edit-task", "@TC-027"],
+    tags: ["@edit-task", "@TC-027"],
   },
   async ({ page }) => {
     let home = new HomePage(page);
