@@ -8,6 +8,7 @@ on:
     types:
       - opened
       - synchronize
+      - labeled
   repository_dispatch:
     types: [app_pr_opened]
 
@@ -32,6 +33,11 @@ jobs:
 
       - name: Run Playwright Smoke Tests against Stage Environment
         env:
+          # GitHub Actions Context Variables
+          EVENT_NAME: ${{ github.event_name }}
+          PR_LABELS: ${{ toJson(github.event.pull_request.labels) }}
+          DISPATCH_PAYLOAD: ${{ toJson(github.event.client_payload) }}
+          ## Env variables for the test suite
           APP_URL: ${{ secrets.APP_URL }}
           APP_TITLE: ${{ secrets.APP_TITLE }}
           WEEK_ONE_START_DATE: ${{ secrets.WEEK_ONE_START_DATE }}
@@ -40,7 +46,39 @@ jobs:
           PRIORITY_NAMES: ${{ secrets.PRIORITY_NAMES }}
           MAX_CHAR_TASK_NAME: ${{ secrets.MAX_CHAR_TASK_NAME }}
           MAX_TASK_REPEAT_COUNT: ${{ secrets.MAX_TASK_REPEAT_COUNT }}
-        run: npx playwright test --grep @smoke
+        run: |
+          GREP_PATTERN="@smoke"
+          RAW_LABELS=""
+
+          echo "Processing workflow triggered by: $EVENT_NAME"
+
+          # 1. Dynamically read based on trigger type
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            echo "Parsing data from PR labels..."
+            RAW_LABELS=$(echo "$PR_LABELS" | jq -r '.[] | .name' 2>/dev/null || echo "")
+
+          elif [ "$EVENT_NAME" = "repository_dispatch" ]; then
+            echo "Parsing data from Repository Dispatch client_payload..."
+            # Expecting either an array or comma-separated string from dispatch
+            RAW_LABELS=$(echo "$DISPATCH_PAYLOAD" | jq -r '.labels | if type=="array" then .[] else strings end' 2>/dev/null || echo "")
+          fi
+
+          # 2. Filter out non-testing tags, strip 'qa-', and format for regex
+          if [ ! -z "$RAW_LABELS" ]; then
+            echo "Raw labels found:"
+            echo "$RAW_LABELS"
+            
+            EXTRA_TAGS=$(echo "$RAW_LABELS" | grep '^qa-' | sed 's/^qa-/@/' | tr '\n' '|' | sed 's/|$//')
+            
+            if [ ! -z "$EXTRA_TAGS" ]; then
+              GREP_PATTERN="$GREP_PATTERN|$EXTRA_TAGS"
+            fi
+          fi
+
+          echo "Executing tests matching pattern: $GREP_PATTERN"
+
+          # 3. Execute Playwright tests
+          npx playwright test --grep "$GREP_PATTERN"
 
       - name: Upload Report
         uses: actions/upload-artifact@v7
