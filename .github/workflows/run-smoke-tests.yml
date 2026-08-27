@@ -81,11 +81,12 @@ jobs:
           npx playwright test --grep "$GREP_PATTERN"
 
       - name: Zip Playwright Report
+        if: ${{ always() }}
         run: zip -r playwright-report.zip playwright-report/
 
       - name: Upload Report
         uses: actions/upload-artifact@v7
-        if: ${{ !cancelled() }}
+        if: ${{ always() && !cancelled() }}
         with:
           name: playwright-report
           path: playwright-report.zip
