@@ -1,6 +1,6 @@
 # To-Do App - Playwright Automation Test Suite
 
-Playwright end-to-end test suite for a to-do list application. The repository demonstrates a practical test automation setup with Page Object Model structure, environment-based configuration, cross-browser execution, Allure reporting, and GitHub Copilot-assisted troubleshooting.
+Playwright end-to-end test suite for a to-do list application. The repository demonstrates a practical test automation setup with Page Object Model structure, environment-based configuration, PR labels that trigger regression testing, cross-browser execution, Allure reporting, and GitHub Copilot-assisted troubleshooting.
 
 ### CI/CD Workflow Architecture
 
@@ -10,7 +10,7 @@ Test execution is automated via GitHub Actions through two CI/CD scenarios:
 
 1. **Developer Action**  
    _`Application Repository`_  
-   A developer opens or updates a Pull Request (PR) in the core application repository.
+   A developer opens or updates a Pull Request (PR) in the core application repository. `qa-` labels on the PR map to regression test tags.
 
 2. **Cross-Repo Dispatch**  
    _`GitHub Actions`_  
@@ -19,6 +19,10 @@ Test execution is automated via GitHub Actions through two CI/CD scenarios:
 3. **Smoke Test Execution**  
    _`Test Automation Repository`_  
    The test repository receives the event webhook and triggers the smoke test suite against the PR build.
+
+4. **Regression Test Execution**  
+   _`Test Automation Repository`_  
+   The test repository receives the event webhook and triggers the applicable regression tests against the PR build.
 
 #### 2) Post-Merge Stage Validation + Published Reports
 
@@ -39,6 +43,7 @@ Test execution is automated via GitHub Actions through two CI/CD scenarios:
 - End-to-end UI testing with Playwright
 - Page Object Model design in the `pom/` directory
 - Environment-driven configuration through `stage.env` (local) and repository secrets (stage)
+- PR labels trigger regression testing
 - Cross-browser test execution across Chromium and WebKit
 - HTML test reporting for review and debugging
 - Allure test report automatically published to site: https://andreaanger.github.io/todo-app-test-suite-playwright/
@@ -71,11 +76,10 @@ npm install
 npx playwright install
 ```
 
-3. Confirm `stage.env` contains the values your tests need. At minimum, this project expects:
+3. Create `stage.env` containing all required environment variables by copying `.env.sample` and adding valid values.
 
 ```bash
-APP_URL=
-APP_TITLE=
+cp .env.sample stage.env
 ```
 
 ## Running Tests
